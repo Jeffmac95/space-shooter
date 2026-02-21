@@ -50,7 +50,7 @@ public class Rock extends Entity {
         height = texture.getRegionHeight();
     }
 
-    
+
     @Override
     public void takeDamage(int damage) {
         super.takeDamage(damage);
