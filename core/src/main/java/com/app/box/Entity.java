@@ -31,4 +31,11 @@ public abstract class Entity {
     public void render(SpriteBatch batch) {
         batch.draw(texture, x, y, width, height);
     }
+
+    public boolean collision(Entity e) {
+        return x < e.x + e.width &&
+               x + width > e.x &&
+               y < e.y + e.height &&
+               y + height > e.y;
+    }
 }

@@ -2,6 +2,7 @@ package com.app.box;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -37,7 +38,7 @@ public class Main extends ApplicationAdapter {
         TextureRegion playerRegion = atlas.findRegion("rocket");
 
         TextureRegion bulletRegion = atlas.findRegion("bullet");
-        player = new Player(288.0f, 0.0f, playerRegion,  atlas, bulletRegion);
+        player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion);
 
         bullets = new Array<>();
         rocks = new Array<>();
@@ -78,6 +79,34 @@ public class Main extends ApplicationAdapter {
             }
         }
 
+        // COLLISION bullet-rock
+        for (int i = bullets.size - 1; i >= 0; i--) {
+            Bullet bullet = bullets.get(i);
+
+            for (int j = rocks.size - 1; j >= 0; j--) {
+                Rock rock = rocks.get(j);
+
+                if (bullet.collision(rock)) {
+                    bullet.isAlive = false;
+                    rock.hp -= 1;
+                    //System.out.println("bullet<->rock");
+                    if (rock.hp <= 0) {
+                        rock.isAlive = false;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // COLLISION player-rock
+        for (Rock rock : rocks) {
+            if (rock.isAlive && player.collision(rock)) {
+                player.hp--;
+                rock.hp--;
+                rock.isAlive = false;
+                //System.out.println("player<->rock " + player.hp);
+            }
+        }
 
 
 /*
@@ -94,7 +123,21 @@ public class Main extends ApplicationAdapter {
             }
             System.out.println("=".repeat(50));
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            System.out.println("=== Rocks (" + rocks.size + ") ===");
+            if (rocks.isEmpty()) {
+                System.out.println("(no rocks)");
+            } else {
+                for (int i = 0; i < rocks.size; i++) {
+                    Rock r = rocks.get(i);
+                    System.out.printf("  [%d] x=%.1f  y=%.1f  alive=%s%n", i, r.x, r.y, r.isAlive);
+                }
+            }
+            System.out.println("=".repeat(50));
+        }
 */
+
 
 
         batch.begin();
