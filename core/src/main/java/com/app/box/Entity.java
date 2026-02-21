@@ -12,6 +12,7 @@ public abstract class Entity {
     protected int width;
     protected int height;
     protected TextureRegion texture;
+    protected int hp;
     boolean isAlive;
 
     public Entity(float x, float y, int width, int height, TextureRegion texture) {
