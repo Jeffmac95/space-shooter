@@ -12,40 +12,52 @@ enum RockSize {
 
 public class Rock extends Entity {
 
+
     private RockSize size;
+    private TextureAtlas atlas;
+    private TextureRegion normalTexture;
+    private TextureRegion damagedTexture;
 
 
     public Rock(float x, float y, RockSize size, TextureAtlas atlas) {
-        super(x, y, getTexture(size, atlas).getRegionWidth(), getTexture(size, atlas).getRegionHeight(), getTexture(size, atlas));
+        super(x, y, 0, 0, null);
         this.size = size;
+        this.atlas = atlas;
         isAlive = true;
 
         switch(size) {
             case SMALL:
+                normalTexture = atlas.findRegion("smRock");
+                texture = normalTexture;
                 speed = 125.0f;
                 hp = 1;
                 break;
             case MEDIUM:
+                normalTexture = atlas.findRegion("medrock");
+                texture = normalTexture;
                 speed = 100.0f;
                 hp = 1;
                 break;
             case LARGE:
+                normalTexture = atlas.findRegion("lrgrock");
+                damagedTexture = atlas.findRegion("lrgrock_hurt");
+                texture = normalTexture;
                 speed = 75.0f;
                 hp = 2;
                 break;
         }
+        width = texture.getRegionWidth();
+        height = texture.getRegionHeight();
     }
 
-    private static TextureRegion getTexture(RockSize size, TextureAtlas atlas) {
-        switch(size) {
-            case SMALL:
-                return atlas.findRegion("smRock");
-            case MEDIUM:
-                return atlas.findRegion("medrock");
-            case LARGE:
-                return atlas.findRegion("lrgrock");
+    
+    @Override
+    public void takeDamage(int damage) {
+        super.takeDamage(damage);
+
+        if (size == RockSize.LARGE && hp == 1) {
+            texture = damagedTexture;
         }
-        return null;
     }
 
     @Override
@@ -55,5 +67,6 @@ public class Rock extends Entity {
         if (y + height < 0) {
             isAlive = false;
         }
+
     }
 }
