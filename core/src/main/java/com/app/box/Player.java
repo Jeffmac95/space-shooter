@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import org.w3c.dom.Text;
 
 public class Player extends Entity {
 
@@ -16,6 +17,9 @@ public class Player extends Entity {
     private Animation<TextureRegion> moveLeftAnimation;
     private float stateTime;
     private TextureRegion currentFrame;
+    private TextureRegion hurtTexture;
+    private float hurtTimer = 0.0f;
+    private float hurtDuration = 0.3f;
 
     public Player(float x, float y, TextureRegion idleTexture, TextureAtlas atlas, TextureRegion bulletTexture) {
         super(x, y, idleTexture.getRegionWidth(), idleTexture.getRegionHeight(), idleTexture);
@@ -36,11 +40,17 @@ public class Player extends Entity {
         moveLeftAnimation = new Animation<>(0.2f, leftFrames, Animation.PlayMode.LOOP);
 
         currentFrame = idleTexture;
+
+        hurtTexture = atlas.findRegion("rocket_hurt");
     }
 
     @Override
     public void update(float delta) {
         boolean moving = false;
+
+        if (hurtTimer > 0) {
+            hurtTimer -= delta;
+        }
 
         // Update animation
         stateTime += delta;
@@ -81,12 +91,23 @@ public class Player extends Entity {
 
     @Override
     public void render(SpriteBatch batch) {
-        batch.draw(currentFrame, x, y, width, height);
+        if (hurtTimer > 0) {
+            batch.draw(hurtTexture, x, y, width, height);
+        } else {
+            batch.draw(currentFrame, x, y, width, height);
+        }
     }
 
     public Bullet shootBullet() {
         Bullet temp = bulletToSpawn;
         bulletToSpawn = null;
         return temp;
+    }
+
+    @Override
+    public void takeDamage(int damage) {
+        super.takeDamage(damage);
+
+        hurtTimer = hurtDuration;
     }
 }
