@@ -3,15 +3,25 @@ package com.app.box;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
+
+    private enum GameState {
+        START_SCREEN,
+        PLAYING,
+        GAME_OVER
+    }
+    private GameState state = GameState.START_SCREEN;
+    private BitmapFont titleFont;
+    private BitmapFont instructionFont;
 
     private SpriteBatch batch;
     private TextureAtlas atlas;
@@ -27,7 +37,6 @@ public class Main extends ApplicationAdapter {
     private UI ui;
     private int score = 0;
 
-
     @Override
     public void create() {
         SCREEN_WIDTH = Gdx.graphics.getWidth();
@@ -37,8 +46,15 @@ public class Main extends ApplicationAdapter {
         atlas = new TextureAtlas(Gdx.files.internal("atlas/textures.atlas"));
 
         background = atlas.findRegion("starrybg");
-        TextureRegion playerRegion = atlas.findRegion("rocket");
 
+        titleFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
+        instructionFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
+        titleFont.getData().setScale(1.5f);
+        titleFont.setColor(1.0f, 0.9f, 0.4f, 1.0f);
+        instructionFont.getData().setScale(1.0f);
+        instructionFont.setColor(Color.WHITE);
+
+        TextureRegion playerRegion = atlas.findRegion("rocket");
         TextureRegion bulletRegion = atlas.findRegion("bullet");
         player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion);
 
@@ -46,14 +62,77 @@ public class Main extends ApplicationAdapter {
 
         bullets = new Array<>();
         rocks = new Array<>();
+
+        rockSpawnTimer = 0;
     }
 
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-        rockSpawnTimer += delta;
-
         ScreenUtils.clear(0.0f, 0.0f, 0.0f, 1f);
+
+        batch.begin();
+
+        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        if (state == GameState.START_SCREEN) {
+            drawStartScreen();
+            startGameInput();
+        }
+        else if (state == GameState.PLAYING) {
+            updateGame(delta);
+            player.render(batch);
+            for (Bullet bullet : bullets) {
+                bullet.render(batch);
+            }
+            for (Rock rock : rocks) {
+                rock.render(batch);
+            }
+            ui.render(batch);
+        }
+        else if (state == GameState.GAME_OVER) {
+            drawGameOver();
+            handleGameOverInput();
+        }
+
+        batch.end();
+    }
+
+    private void drawStartScreen() {
+        String title = "MILKY WAY DEFENDER";
+        String instructions = "Left Click on the screen to PLAY";
+
+        float titleX = (SCREEN_WIDTH / 2.0f) - 225;
+        float titleY = SCREEN_HEIGHT - 100;
+        float instructionX = (SCREEN_WIDTH / 2.0f) - 200;
+        float instructionY = SCREEN_HEIGHT - 300;
+
+        titleFont.draw(batch, title, titleX, titleY);
+        instructionFont.draw(batch, instructions, instructionX, instructionY);
+    }
+
+    private void startGameInput() {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            startGame();
+        }
+    }
+
+    private void startGame() {
+        state = GameState.PLAYING;
+
+        score = 0;
+        player.hp = 10;
+        player.shotsFired = 0;
+        player.shotsHit = 0;
+        bullets.clear();
+        rocks.clear();
+        rockSpawnTimer = 0;
+        player.x = 288.0f;
+        player.y = 0;
+    }
+
+    private void updateGame(float delta) {
+        rockSpawnTimer += delta;
 
         player.update(delta);
 
@@ -90,7 +169,6 @@ public class Main extends ApplicationAdapter {
 
             for (int j = rocks.size - 1; j >= 0; j--) {
                 Rock rock = rocks.get(j);
-
                 if (bullet.collision(rock)) {
                     bullet.isAlive = false;
                     rock.takeDamage(1);
@@ -114,55 +192,32 @@ public class Main extends ApplicationAdapter {
 
         ui.update(score);
 
-
-/*
-        // DEBUG ARRAY
-        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
-            System.out.println("=== Bullets (" + bullets.size + ") ===");
-            if (bullets.isEmpty()) {
-                System.out.println("  (no bullets)");
-            } else {
-                for (int i = 0; i < bullets.size; i++) {
-                    Bullet b = bullets.get(i);
-                    System.out.printf("  [%d] x=%.1f  y=%.1f  alive=%s%n", i, b.x, b.y, b.isAlive);
-                }
-            }
-            System.out.println("=".repeat(50));
+        if (player.hp <= 0) {
+            state = GameState.GAME_OVER;
         }
+    }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            System.out.println("=== Rocks (" + rocks.size + ") ===");
-            if (rocks.isEmpty()) {
-                System.out.println("(no rocks)");
-            } else {
-                for (int i = 0; i < rocks.size; i++) {
-                    Rock r = rocks.get(i);
-                    System.out.printf("  [%d] x=%.1f  y=%.1f  alive=%s%n", i, r.x, r.y, r.isAlive);
-                }
-            }
-            System.out.println("=".repeat(50));
+    public void drawGameOver() {
+        String gameOverText = "GAME OVER";
+        String finalScoreText = "Final Score: " + score;
+        String retryText = "Right Click to PLAY again!";
+
+        float overX = SCREEN_WIDTH / 2 - 125;
+        float overY = SCREEN_HEIGHT / 2 + 100;
+        float scoreX = SCREEN_WIDTH / 2 - 100;
+        float scoreY = (SCREEN_HEIGHT / 2) - 75;
+        float retryX = SCREEN_WIDTH / 2 - 175;
+        float retryY = (SCREEN_HEIGHT / 2) - 200;
+
+        titleFont.draw(batch, gameOverText, overX, overY);
+        instructionFont.draw(batch, finalScoreText, scoreX, scoreY);
+        instructionFont.draw(batch, retryText, retryX, retryY);
+    }
+
+    private void handleGameOverInput() {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            startGame();
         }
-*/
-
-
-
-        batch.begin();
-
-        batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        player.render(batch);
-
-        for (Bullet bullet : bullets) {
-            bullet.render(batch);
-        }
-        for (Rock rock : rocks) {
-            rock.render(batch);
-        }
-
-        batch.end();
-
-        batch.begin();
-        ui.render(batch);
-        batch.end();
     }
 
     private void spawnRock() {
@@ -183,5 +238,7 @@ public class Main extends ApplicationAdapter {
         batch.dispose();
         atlas.dispose();
         ui.dispose();
+        titleFont.dispose();
+        instructionFont.dispose();
     }
 }
