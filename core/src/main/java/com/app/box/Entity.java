@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public abstract class Entity {
 
+
     protected float x;
     protected float y;
     protected float speed;
@@ -14,6 +15,7 @@ public abstract class Entity {
     protected TextureRegion texture;
     protected int hp;
     boolean isAlive;
+
 
     public Entity(float x, float y, int width, int height, TextureRegion texture) {
         this.x = x;

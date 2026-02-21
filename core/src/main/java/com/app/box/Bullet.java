@@ -13,6 +13,7 @@ public class Bullet extends Entity {
         this.hp = 1;
     }
 
+
     @Override
     public void update(float delta) {
         y += speed * delta;
