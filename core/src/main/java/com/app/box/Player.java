@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 
 public class Player extends Entity {
 
-    private int hp = 10;
     private TextureRegion bulletTexture;
     private Bullet bulletToSpawn;
     private Animation<TextureRegion> moveRightAnimation;
@@ -22,6 +21,7 @@ public class Player extends Entity {
         super(x, y, idleTexture.getRegionWidth(), idleTexture.getRegionHeight(), idleTexture);
         speed = 300.0f;
         isAlive = true;
+        this.hp = 10;
         this.bulletTexture = bulletTexture;
 
         // Animation
