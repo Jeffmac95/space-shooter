@@ -38,4 +38,11 @@ public abstract class Entity {
                y < e.y + e.height &&
                y + height > e.y;
     }
+
+    public void takeDamage(int damage) {
+        hp -= damage;
+        if (hp <= 0) {
+            isAlive = false;
+        }
+    }
 }
