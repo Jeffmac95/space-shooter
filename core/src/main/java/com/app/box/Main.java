@@ -92,9 +92,8 @@ public class Main extends ApplicationAdapter {
 
                 if (bullet.collision(rock)) {
                     bullet.isAlive = false;
-                    rock.hp -= 1;
-                    if (rock.hp <= 0) {
-                        rock.isAlive = false;
+                    rock.takeDamage(1);
+                    if (!rock.isAlive) {
                         score += 10;
                     }
                     break;
@@ -105,8 +104,8 @@ public class Main extends ApplicationAdapter {
         // COLLISION player-rock
         for (Rock rock : rocks) {
             if (rock.isAlive && player.collision(rock)) {
-                player.hp--;
-                rock.hp--;
+                player.takeDamage(1);
+                rock.takeDamage(1);
                 rock.isAlive = false;
             }
         }
