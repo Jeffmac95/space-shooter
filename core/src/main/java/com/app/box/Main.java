@@ -24,6 +24,8 @@ public class Main extends ApplicationAdapter {
     private static int MAX_ROCKS = 4;
     private static float SCREEN_WIDTH;
     private static float SCREEN_HEIGHT;
+    private UI ui;
+    private int score = 0;
 
 
     @Override
@@ -39,6 +41,8 @@ public class Main extends ApplicationAdapter {
 
         TextureRegion bulletRegion = atlas.findRegion("bullet");
         player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion);
+
+        ui = new UI(atlas, player);
 
         bullets = new Array<>();
         rocks = new Array<>();
@@ -89,9 +93,9 @@ public class Main extends ApplicationAdapter {
                 if (bullet.collision(rock)) {
                     bullet.isAlive = false;
                     rock.hp -= 1;
-                    //System.out.println("bullet<->rock");
                     if (rock.hp <= 0) {
                         rock.isAlive = false;
+                        score += 10;
                     }
                     break;
                 }
@@ -104,9 +108,10 @@ public class Main extends ApplicationAdapter {
                 player.hp--;
                 rock.hp--;
                 rock.isAlive = false;
-                //System.out.println("player<->rock " + player.hp);
             }
         }
+
+        ui.update(score);
 
 
 /*
@@ -153,6 +158,10 @@ public class Main extends ApplicationAdapter {
         }
 
         batch.end();
+
+        batch.begin();
+        ui.render(batch);
+        batch.end();
     }
 
     private void spawnRock() {
@@ -172,5 +181,6 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         atlas.dispose();
+        ui.dispose();
     }
 }
