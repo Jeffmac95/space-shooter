@@ -30,7 +30,7 @@ public class Main extends ApplicationAdapter {
         TextureRegion playerRegion = atlas.findRegion("rocket");
 
         TextureRegion bulletRegion = atlas.findRegion("bullet");
-        player = new Player(288.0f, 0.0f, playerRegion, bulletRegion);
+        player = new Player(288.0f, 0.0f, playerRegion,  atlas, bulletRegion);
 
         bullets = new Array<>();
     }
