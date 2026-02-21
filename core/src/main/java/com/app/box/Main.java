@@ -73,6 +73,7 @@ public class Main extends ApplicationAdapter {
         Bullet newBullet = player.shootBullet();
         if (newBullet != null) {
             bullets.add(newBullet);
+            player.shotsFired++;
         }
 
         for (int i = bullets.size - 1; i >= 0; i--) {
@@ -93,6 +94,7 @@ public class Main extends ApplicationAdapter {
                 if (bullet.collision(rock)) {
                     bullet.isAlive = false;
                     rock.takeDamage(1);
+                    player.shotsHit++;
                     if (!rock.isAlive) {
                         score += 10;
                     }

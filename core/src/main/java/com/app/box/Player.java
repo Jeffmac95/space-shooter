@@ -11,6 +11,7 @@ import org.w3c.dom.Text;
 
 public class Player extends Entity {
 
+
     private TextureRegion bulletTexture;
     private Bullet bulletToSpawn;
     private Animation<TextureRegion> moveRightAnimation;
@@ -20,6 +21,9 @@ public class Player extends Entity {
     private TextureRegion hurtTexture;
     private float hurtTimer = 0.0f;
     private float hurtDuration = 0.3f;
+    int shotsFired = 0;
+    int shotsHit = 0;
+
 
     public Player(float x, float y, TextureRegion idleTexture, TextureAtlas atlas, TextureRegion bulletTexture) {
         super(x, y, idleTexture.getRegionWidth(), idleTexture.getRegionHeight(), idleTexture);
@@ -109,5 +113,12 @@ public class Player extends Entity {
         super.takeDamage(damage);
 
         hurtTimer = hurtDuration;
+    }
+
+    public float getAccuracy() {
+        if (shotsFired == 0) {
+            return 0.0f;
+        }
+        return (shotsHit / (float)shotsFired) * 100.0f;
     }
 }
