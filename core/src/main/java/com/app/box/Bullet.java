@@ -8,7 +8,7 @@ public class Bullet extends Entity {
 
     public Bullet(float x, float y, TextureRegion texture) {
         super(x, y, texture.getRegionWidth(), texture.getRegionHeight(), texture);
-        speed = 200.0f;
+        speed = 300.0f;
         isAlive = true;
         this.hp = 1;
     }
