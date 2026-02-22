@@ -85,11 +85,11 @@ public class Player extends Entity {
 
 
         // Screen bounds
-        if (x > Gdx.graphics.getWidth()) {
-            x = 0.0f;
+        if (x > Gdx.graphics.getWidth() - width) {
+            x = Gdx.graphics.getWidth() - width;
         }
         if (x < 0) {
-            x = Gdx.graphics.getWidth();
+            x = 0;
         }
     }
 
