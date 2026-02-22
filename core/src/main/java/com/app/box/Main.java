@@ -3,6 +3,8 @@ package com.app.box;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,6 +39,11 @@ public class Main extends ApplicationAdapter {
     private static float SCREEN_HEIGHT;
     private UI ui;
     private int score = 0;
+    private Music introMusic;
+    private Music gameMusic;
+    private Music outroMusic;
+    private Sound laserSound;
+    private Sound collisionSound;
 
     @Override
     public void create() {
@@ -55,15 +62,31 @@ public class Main extends ApplicationAdapter {
         instructionFont.getData().setScale(1.0f);
         instructionFont.setColor(Color.WHITE);
 
+        laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser1.wav"));
+        collisionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
+
         TextureRegion playerRegion = atlas.findRegion("rocket");
         TextureRegion bulletRegion = atlas.findRegion("bullet");
-        player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion);
+        player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion, laserSound);
 
         ui = new UI(atlas, player);
 
         bullets = new Array<>();
         rocks = new Array<>();
         particles = new Array<>();
+
+        introMusic = Gdx.audio.newMusic(Gdx.files.internal("music/throughspace.ogg"));
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("music/DST-TowerDefenseTheme.mp3"));
+        outroMusic = Gdx.audio.newMusic(Gdx.files.internal("music/ruskerdax_-_soul_release.mp3"));
+        introMusic.setLooping(true);
+        introMusic.setVolume(0.6f);
+        gameMusic.setLooping(true);
+        gameMusic.setVolume(0.8f);
+        outroMusic.setLooping(true);
+        outroMusic.setVolume(0.6f);
+        playIntroMusic();
+
+
 
         rockSpawnTimer = 0;
     }
@@ -125,6 +148,8 @@ public class Main extends ApplicationAdapter {
 
     private void startGame() {
         state = GameState.PLAYING;
+
+        playGameMusic();
 
         score = 0;
         player.hp = 10;
@@ -189,6 +214,7 @@ public class Main extends ApplicationAdapter {
                     rock.takeDamage(1);
                     player.shotsHit++;
 
+                    playCollisionSound();
                     spawnParticles(bullet.x + bullet.width/2.0f, bullet.y + bullet.height / 2.0f, 8);
                     if (!rock.isAlive) {
                         score += 10;
@@ -204,6 +230,7 @@ public class Main extends ApplicationAdapter {
                 player.takeDamage(1);
                 rock.takeDamage(1);
                 rock.isAlive = false;
+                playCollisionSound();
             }
         }
 
@@ -211,6 +238,7 @@ public class Main extends ApplicationAdapter {
 
         if (player.hp <= 0) {
             state = GameState.GAME_OVER;
+            playOutroMusic();
         }
     }
 
@@ -221,7 +249,7 @@ public class Main extends ApplicationAdapter {
 
         float overX = SCREEN_WIDTH / 2 - 125;
         float overY = SCREEN_HEIGHT / 2 + 100;
-        float scoreX = SCREEN_WIDTH / 2 - 100;
+        float scoreX = SCREEN_WIDTH / 2 - 110;
         float scoreY = (SCREEN_HEIGHT / 2) - 75;
         float retryX = SCREEN_WIDTH / 2 - 175;
         float retryY = (SCREEN_HEIGHT / 2) - 200;
@@ -237,6 +265,7 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    // SPAWN
     private void spawnRock() {
         RockSize[] sizes = RockSize.values();
         RockSize randomSize = sizes[(int)(MathUtils.random() * sizes.length)];
@@ -257,6 +286,32 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    // MUSIC
+    private void playIntroMusic() {
+        gameMusic.stop();
+        introMusic.play();
+    }
+
+    private void playGameMusic() {
+        introMusic.stop();
+        gameMusic.play();
+    }
+
+    private void playOutroMusic() {
+        gameMusic.stop();
+        outroMusic.play();
+    }
+
+    private void stopMusic() {
+        introMusic.stop();
+        gameMusic.stop();
+    }
+
+    //SOUNDS
+    private void playCollisionSound() {
+        collisionSound.play(0.4f);
+    }
+
     @Override
     public void dispose() {
         batch.dispose();
@@ -264,5 +319,10 @@ public class Main extends ApplicationAdapter {
         ui.dispose();
         titleFont.dispose();
         instructionFont.dispose();
+        introMusic.dispose();
+        gameMusic.dispose();
+        outroMusic.dispose();
+        laserSound.dispose();
+        collisionSound.dispose();
     }
 }

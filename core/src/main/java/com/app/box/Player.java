@@ -2,6 +2,7 @@ package com.app.box;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -23,14 +24,16 @@ public class Player extends Entity {
     private float hurtDuration = 0.3f;
     int shotsFired = 0;
     int shotsHit = 0;
+    private Sound laserSound;
 
 
-    public Player(float x, float y, TextureRegion idleTexture, TextureAtlas atlas, TextureRegion bulletTexture) {
+    public Player(float x, float y, TextureRegion idleTexture, TextureAtlas atlas, TextureRegion bulletTexture, Sound laserSound) {
         super(x, y, idleTexture.getRegionWidth(), idleTexture.getRegionHeight(), idleTexture);
         speed = 300.0f;
         isAlive = true;
         this.hp = 10;
         this.bulletTexture = bulletTexture;
+        this.laserSound = laserSound;
 
         // Animation
         Array<TextureRegion> rightFrames = new Array<>();
@@ -76,6 +79,7 @@ public class Player extends Entity {
             float bulletX = x + width /2.0f - bulletTexture.getRegionWidth() / 2.0f;
             float bulletY = y + height;
             bulletToSpawn = new Bullet(bulletX, bulletY, bulletTexture);
+            playLaserSound();
         }
 
         if (!moving) {
@@ -120,5 +124,9 @@ public class Player extends Entity {
             return 0.0f;
         }
         return (shotsHit / (float)shotsFired) * 100.0f;
+    }
+
+    private void playLaserSound() {
+        laserSound.play(0.4f);
     }
 }
