@@ -1,0 +1,41 @@
+Music/Sound Credits for Milky Way Defender
+
+Source: OpenGameArt.org
+
+MUSIC
+
+INTRO MUSIC
+Title: Through Space
+Author: maxstack
+License: CC-BY-SA 3.0
+Link: https://opengameart.org/content/through-space
+
+GAME MUSIC
+Title: Tower Defense Theme
+Author: DST
+License: CC0 (Public Domain)
+Link: https://opengameart.org/content/tower-defense-theme
+
+OUTRO MUSIC
+Title: Soul Release
+Author: Ruskerdax
+License: CC0 (Public Domain)
+Link: https://opengameart.org/content/soul-release
+
+
+SOUNDS
+
+SHOOTING SOUND
+Title: Laser Fire (laser1)
+Author: dklon
+License: CC-BY 3.0
+Link: https://opengameart.org/content/laser-fire
+
+COLLISION SOUND
+Title: Explosion
+Author: TinyWorlds
+License: CC0 (Public Domain)
+Link: https://opengameart.org/content/explosion-0
+
+
+Thank you to the creators for providing this awesome free music!
