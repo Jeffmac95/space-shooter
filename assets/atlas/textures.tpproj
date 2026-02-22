@@ -34,7 +34,7 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:../bullet.png,type:Input,regionName:null},{path:../lrgrock_64.png,type:Input,regionName:null},{path:../lrgrock_hurt.png,type:Input,regionName:null},{path:../medrock.png,type:Input,regionName:null},{path:../rocket.png,type:Input,regionName:null},{path:../rocket_hurt.png,type:Input,regionName:null},{path:../rocket_ml1.png,type:Input,regionName:null},{path:../rocket_ml2.png,type:Input,regionName:null},{path:../rocket_mr1.png,type:Input,regionName:null},{path:../rocket_mr2.png,type:Input,regionName:null},{path:../smRock.png,type:Input,regionName:null},{path:../starrybg.png,type:Input,regionName:null}]
+inputFiles=[{path:../bullet.png,type:Input,regionName:null},{path:../lrgrock_64.png,type:Input,regionName:null},{path:../lrgrock_hurt.png,type:Input,regionName:null},{path:../medrock.png,type:Input,regionName:null},{path:../rocket.png,type:Input,regionName:null},{path:../rocket_hurt.png,type:Input,regionName:null},{path:../rocket_ml1.png,type:Input,regionName:null},{path:../rocket_ml2.png,type:Input,regionName:null},{path:../rocket_mr1.png,type:Input,regionName:null},{path:../rocket_mr2.png,type:Input,regionName:null},{path:../smRock.png,type:Input,regionName:null},{path:../starrybg.png,type:Input,regionName:null},{path:../particle.png,type:Input,regionName:null}]
 keepInputFileExtensions=false
 
 

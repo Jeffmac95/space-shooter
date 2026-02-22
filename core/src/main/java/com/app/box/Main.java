@@ -29,6 +29,7 @@ public class Main extends ApplicationAdapter {
     private Player player;
     private Array<Bullet> bullets;
     private Array<Rock> rocks;
+    private Array<Particle> particles;
     private float rockSpawnTimer;
     private float rockSpawnInterval = 1.5f;
     private static int MAX_ROCKS = 4;
@@ -62,6 +63,7 @@ public class Main extends ApplicationAdapter {
 
         bullets = new Array<>();
         rocks = new Array<>();
+        particles = new Array<>();
 
         rockSpawnTimer = 0;
     }
@@ -88,6 +90,10 @@ public class Main extends ApplicationAdapter {
             for (Rock rock : rocks) {
                 rock.render(batch);
             }
+            for (Particle particle : particles) {
+                particle.render(batch);
+            }
+
             ui.render(batch);
         }
         else if (state == GameState.GAME_OVER) {
@@ -126,6 +132,7 @@ public class Main extends ApplicationAdapter {
         player.shotsHit = 0;
         bullets.clear();
         rocks.clear();
+        particles.clear();
         rockSpawnTimer = 0;
         player.x = 288.0f;
         player.y = 0;
@@ -163,6 +170,14 @@ public class Main extends ApplicationAdapter {
             }
         }
 
+        for (int i = particles.size - 1; i >= 0; i--) {
+            Particle particle = particles.get(i);
+            particle.update(delta);
+            if (!particle.isAlive) {
+                particles.removeIndex(i);
+            }
+        }
+
         // COLLISION bullet-rock
         for (int i = bullets.size - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
@@ -173,6 +188,8 @@ public class Main extends ApplicationAdapter {
                     bullet.isAlive = false;
                     rock.takeDamage(1);
                     player.shotsHit++;
+
+                    spawnParticles(bullet.x + bullet.width/2.0f, bullet.y + bullet.height / 2.0f, 8);
                     if (!rock.isAlive) {
                         score += 10;
                     }
@@ -231,6 +248,13 @@ public class Main extends ApplicationAdapter {
         float spawnY = SCREEN_HEIGHT;
 
         rocks.add(new Rock(randomX, spawnY, randomSize, atlas));
+    }
+
+    private void spawnParticles(float x, float y, int count) {
+        TextureRegion spark = atlas.findRegion("particle");
+        for (int i = 0; i < count; i++) {
+            particles.add(new Particle(x, y, spark));
+        }
     }
 
     @Override

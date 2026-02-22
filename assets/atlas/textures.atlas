@@ -10,6 +10,8 @@ lrgrock_hurt
 bounds:1245,1367,64,64
 medrock
 bounds:128,152,40,40
+particle
+bounds:1373,1423,8,8
 rocket
 bounds:64,64,64,64
 rocket_hurt
