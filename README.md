@@ -1,33 +1,26 @@
-# MilkyWayDefender
+# Milky Way Defender 🚀
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+A 2D arcade space shooter built with LibGDX.
+Control your rocket, dodge falling asteroids, and shoot
+them down to increase your score and accuracy
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+---
 
-## Platforms
+## 🎮 Gameplay
+* Move left and right to avoid incoming rocks
+* Shoot asteroids
+* Player starts with 10 hp
+* Large asteroids have higher hp
+* Score increases when rocks are destroyed
+* Accuracy percentage is calculated from shots fired vs hits
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+## 🛠️ Built With
+* Java 21 (Oracle OpenJDK 21.0.4)
+* LibGDX 1.12.1
+* LWJGL3 (Desktop launcher)
+* Gradle
 
-## Gradle
-
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
-
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
-
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+## ▶️ Running the Game
+* Run using Gradle: `./gradlew lwjgl3:run`
+* Build a runnable JAR: `./gradlew lwjgl3:jar`
+* The JAR will be located at: `lwjgl3/build/libs`
