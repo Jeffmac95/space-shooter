@@ -2,28 +2,19 @@ package com.app.box;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends ApplicationAdapter {
 
-    private enum GameState {
-        START_SCREEN,
-        PLAYING,
-        GAME_OVER
-    }
-    private GameState state = GameState.START_SCREEN;
-    private BitmapFont titleFont;
-    private BitmapFont instructionFont;
+public class Main extends ApplicationAdapter implements ScreenManager.ScreenListener {
+
+
+    private ScreenManager screenManager;
 
     private SpriteBatch batch;
     private TextureAtlas atlas;
@@ -32,18 +23,22 @@ public class Main extends ApplicationAdapter {
     private Array<Bullet> bullets;
     private Array<Rock> rocks;
     private Array<Particle> particles;
+
     private float rockSpawnTimer;
     private float rockSpawnInterval = 1.5f;
     private static int MAX_ROCKS = 4;
     private static float SCREEN_WIDTH;
     private static float SCREEN_HEIGHT;
+
     private UI ui;
     private int score = 0;
+
     private Music introMusic;
     private Music gameMusic;
     private Music outroMusic;
     private Sound laserSound;
     private Sound collisionSound;
+
 
     @Override
     public void create() {
@@ -52,15 +47,7 @@ public class Main extends ApplicationAdapter {
 
         batch = new SpriteBatch();
         atlas = new TextureAtlas(Gdx.files.internal("atlas/textures.atlas"));
-
         background = atlas.findRegion("starrybg");
-
-        titleFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
-        instructionFont = new BitmapFont(Gdx.files.internal("font/font.fnt"));
-        titleFont.getData().setScale(1.5f);
-        titleFont.setColor(1.0f, 0.9f, 0.4f, 1.0f);
-        instructionFont.getData().setScale(1.0f);
-        instructionFont.setColor(Color.WHITE);
 
         laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser1.wav"));
         collisionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
@@ -70,6 +57,7 @@ public class Main extends ApplicationAdapter {
         player = new Player(288.0f, 0.0f, playerRegion, atlas, bulletRegion, laserSound);
 
         ui = new UI(atlas, player);
+        screenManager = new ScreenManager(this);
 
         bullets = new Array<>();
         rocks = new Array<>();
@@ -84,10 +72,8 @@ public class Main extends ApplicationAdapter {
         gameMusic.setVolume(0.8f);
         outroMusic.setLooping(true);
         outroMusic.setVolume(0.6f);
+
         playIntroMusic();
-
-
-
         rockSpawnTimer = 0;
     }
 
@@ -97,75 +83,49 @@ public class Main extends ApplicationAdapter {
         ScreenUtils.clear(0.0f, 0.0f, 0.0f, 1f);
 
         batch.begin();
-
         batch.draw(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        if (state == GameState.START_SCREEN) {
-            drawStartScreen();
-            startGameInput();
-        }
-        else if (state == GameState.PLAYING) {
+        if (screenManager.isPlaying()) {
             updateGame(delta);
             player.render(batch);
-            for (Bullet bullet : bullets) {
-                bullet.render(batch);
-            }
-            for (Rock rock : rocks) {
-                rock.render(batch);
-            }
-            for (Particle particle : particles) {
-                particle.render(batch);
-            }
-
+            for (Bullet bullet : bullets) { bullet.render(batch); }
+            for (Rock rock : rocks) { rock.render(batch); }
+            for (Particle particle : particles) { particle.render(batch); }
             ui.render(batch);
-        }
-        else if (state == GameState.GAME_OVER) {
-            drawGameOver();
-            handleGameOverInput();
+        } else {
+            screenManager.update(batch, score);
         }
 
         batch.end();
     }
 
-    private void drawStartScreen() {
-        String title = "MILKY WAY DEFENDER";
-        String instructions = "Left Click on the screen to PLAY";
-
-        float titleX = (SCREEN_WIDTH / 2.0f) - 225;
-        float titleY = SCREEN_HEIGHT - 100;
-        float instructionX = (SCREEN_WIDTH / 2.0f) - 200;
-        float instructionY = SCREEN_HEIGHT - 300;
-
-        titleFont.draw(batch, title, titleX, titleY);
-        instructionFont.draw(batch, instructions, instructionX, instructionY);
-    }
-
-    private void startGameInput() {
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            startGame();
-        }
-    }
-
-    private void startGame() {
-        state = GameState.PLAYING;
-
+    @Override
+    public void onStartGame() {
+        resetGame();
         playGameMusic();
+    }
 
+    @Override
+    public void onRestartGame() {
+        resetGame();
+        playGameMusic();
+    }
+
+    private void resetGame() {
         score = 0;
         player.hp = 10;
         player.shotsFired = 0;
         player.shotsHit = 0;
+        player.x = 288.0f;
+        player.y = 0;
         bullets.clear();
         rocks.clear();
         particles.clear();
         rockSpawnTimer = 0;
-        player.x = 288.0f;
-        player.y = 0;
     }
 
     private void updateGame(float delta) {
         rockSpawnTimer += delta;
-
         player.update(delta);
 
         if (rockSpawnTimer >= rockSpawnInterval && rocks.size < MAX_ROCKS) {
@@ -176,9 +136,7 @@ public class Main extends ApplicationAdapter {
         for (int i = rocks.size - 1; i >= 0; i--) {
             Rock rock = rocks.get(i);
             rock.update(delta);
-            if (!rock.isAlive) {
-                rocks.removeIndex(i);
-            }
+            if (!rock.isAlive) { rocks.removeIndex(i); }
         }
 
         Bullet newBullet = player.shootBullet();
@@ -190,20 +148,16 @@ public class Main extends ApplicationAdapter {
         for (int i = bullets.size - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
             bullet.update(delta);
-            if (!bullet.isAlive) {
-                bullets.removeIndex(i);
-            }
+            if (!bullet.isAlive) { bullets.removeIndex(i); }
         }
 
         for (int i = particles.size - 1; i >= 0; i--) {
             Particle particle = particles.get(i);
             particle.update(delta);
-            if (!particle.isAlive) {
-                particles.removeIndex(i);
-            }
+            if (!particle.isAlive) { particles.removeIndex(i); }
         }
 
-        // COLLISION bullet-rock
+        // bullet-rock collision
         for (int i = bullets.size - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
 
@@ -213,70 +167,39 @@ public class Main extends ApplicationAdapter {
                     bullet.isAlive = false;
                     rock.takeDamage(1);
                     player.shotsHit++;
-
-                    playCollisionSound();
-                    spawnParticles(bullet.x + bullet.width/2.0f, bullet.y + bullet.height / 2.0f, 8);
-                    if (!rock.isAlive) {
-                        score += 10;
-                    }
+                    collisionSound.play(0.4f);
+                    spawnParticles(bullet.x + bullet.width / 2.0f, bullet.y + bullet.height / 2.0f, 8);
+                    if (!rock.isAlive) { score += 10; }
                     break;
                 }
             }
         }
 
-        // COLLISION player-rock
+        // player-rock collision
         for (Rock rock : rocks) {
             if (rock.isAlive && player.collision(rock)) {
                 player.takeDamage(1);
                 rock.takeDamage(1);
                 rock.isAlive = false;
-                playCollisionSound();
+                collisionSound.play(0.4f);
             }
         }
 
         ui.update(score);
 
         if (player.hp <= 0) {
-            state = GameState.GAME_OVER;
+            screenManager.setState(ScreenManager.GameState.GAME_OVER);
             playOutroMusic();
         }
     }
 
-    public void drawGameOver() {
-        String gameOverText = "GAME OVER";
-        String finalScoreText = "Final Score: " + score;
-        String retryText = "Right Click to PLAY again!";
-
-        float overX = SCREEN_WIDTH / 2 - 125;
-        float overY = SCREEN_HEIGHT / 2 + 100;
-        float scoreX = SCREEN_WIDTH / 2 - 110;
-        float scoreY = (SCREEN_HEIGHT / 2) - 75;
-        float retryX = SCREEN_WIDTH / 2 - 175;
-        float retryY = (SCREEN_HEIGHT / 2) - 200;
-
-        titleFont.draw(batch, gameOverText, overX, overY);
-        instructionFont.draw(batch, finalScoreText, scoreX, scoreY);
-        instructionFont.draw(batch, retryText, retryX, retryY);
-    }
-
-    private void handleGameOverInput() {
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-            startGame();
-        }
-    }
-
-    // SPAWN
     private void spawnRock() {
         RockSize[] sizes = RockSize.values();
         RockSize randomSize = sizes[(int)(MathUtils.random() * sizes.length)];
-
         Rock temp = new Rock(0, 0, randomSize, atlas);
-
         float maxX = SCREEN_WIDTH - temp.width;
         float randomX = MathUtils.random() * maxX;
-        float spawnY = SCREEN_HEIGHT;
-
-        rocks.add(new Rock(randomX, spawnY, randomSize, atlas));
+        rocks.add(new Rock(randomX, SCREEN_HEIGHT, randomSize, atlas));
     }
 
     private void spawnParticles(float x, float y, int count) {
@@ -286,30 +209,22 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    // MUSIC
     private void playIntroMusic() {
         gameMusic.stop();
+        outroMusic.stop();
         introMusic.play();
     }
 
     private void playGameMusic() {
         introMusic.stop();
+        outroMusic.stop();
         gameMusic.play();
     }
 
     private void playOutroMusic() {
         gameMusic.stop();
-        outroMusic.play();
-    }
-
-    private void stopMusic() {
         introMusic.stop();
-        gameMusic.stop();
-    }
-
-    //SOUNDS
-    private void playCollisionSound() {
-        collisionSound.play(0.4f);
+        outroMusic.play();
     }
 
     @Override
@@ -317,8 +232,7 @@ public class Main extends ApplicationAdapter {
         batch.dispose();
         atlas.dispose();
         ui.dispose();
-        titleFont.dispose();
-        instructionFont.dispose();
+        screenManager.dispose();
         introMusic.dispose();
         gameMusic.dispose();
         outroMusic.dispose();
