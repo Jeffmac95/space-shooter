@@ -7,12 +7,15 @@ them down to increase your score and accuracy
 ---
 
 ## 🎮 Gameplay
-* Move left and right to avoid incoming rocks
+* Move left and right to avoid incoming asteroids
 * Shoot asteroids
 * Player starts with 10 hp
 * Large asteroids have higher hp
-* Score increases when rocks are destroyed
+* Score increases when asteroids are destroyed
 * Accuracy percentage is calculated from shots fired vs hits
+* Difficulty increases over time
+* Asteroids spawn faster the longer you survive
+* Every 10 seconds the maximum number of asteroids increases (up to 14)
 
 ## 🛠️ Built With
 * Java 21 (Oracle OpenJDK 21.0.4)
