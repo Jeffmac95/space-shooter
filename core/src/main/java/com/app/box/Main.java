@@ -26,9 +26,11 @@ public class Main extends ApplicationAdapter implements ScreenManager.ScreenList
 
     private float rockSpawnTimer;
     private float rockSpawnInterval = 1.5f;
-    private static int MAX_ROCKS = 4;
+    private int maxRocks = 4;
     private static float SCREEN_WIDTH;
     private static float SCREEN_HEIGHT;
+
+    private float survivalTime = 0f;
 
     private UI ui;
     private int score = 0;
@@ -122,13 +124,17 @@ public class Main extends ApplicationAdapter implements ScreenManager.ScreenList
         rocks.clear();
         particles.clear();
         rockSpawnTimer = 0;
+        survivalTime = 0;
     }
 
     private void updateGame(float delta) {
+        survivalTime += delta;
+        updateDifficulty();
+
         rockSpawnTimer += delta;
         player.update(delta);
 
-        if (rockSpawnTimer >= rockSpawnInterval && rocks.size < MAX_ROCKS) {
+        if (rockSpawnTimer >= rockSpawnInterval && rocks.size < maxRocks) {
             spawnRock();
             rockSpawnTimer = 0;
         }
@@ -225,6 +231,11 @@ public class Main extends ApplicationAdapter implements ScreenManager.ScreenList
         gameMusic.stop();
         introMusic.stop();
         outroMusic.play();
+    }
+
+    private void updateDifficulty() {
+        rockSpawnInterval = Math.max(0.5f, 1.5f - survivalTime * 0.05f);
+        maxRocks = Math.min(14, 4 + (int)(survivalTime / 10.0f));
     }
 
     @Override
